@@ -1,7 +1,6 @@
 package ru.netology.servlet;
 
 import ru.netology.controller.PostController;
-import ru.netology.exception.NotFoundException;
 import ru.netology.repository.PostRepository;
 import ru.netology.service.PostService;
 
@@ -21,41 +20,35 @@ public class MainServlet extends HttpServlet {
     public static final String DELETE_METHOD = "DELETE";
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         final var repository = new PostRepository();
         final var service = new PostService(repository);
         postController = new PostController(service);
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse response) {
-        try {
-            final var path = req.getRequestURI();
-            final var method = req.getMethod();
+    protected void service(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
+
+        final var path = req.getRequestURI();
+        final var method = req.getMethod();
 
 
-            if (method.equals(GET_METHOD) && path.equals(API_POSTS)) {
-                postController.all(response);
-                return;
-            }
-            if (method.equals(GET_METHOD) && path.matches(API_POSTS_ID)) {
-                final var id = Long.parseLong(path.substring(path.lastIndexOf(STR) + 1));
-                postController.getById(id, response);
-                return;
-            }
-            if (method.equals(POST_METHOD) && path.equals(API_POSTS)) {
-                postController.save(req.getReader(), response);
-            }
-            if (method.equals(DELETE_METHOD) && path.matches(API_POSTS_ID)) {
-                final var id = Long.parseLong(path.substring(path.lastIndexOf(STR) + 1));
-                postController.removeById(id, response);
-            }
-        } catch (NotFoundException e) {
-            e.getMessage();
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        } catch (IOException ioException) {
-            ioException.getMessage();
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        if (method.equals(GET_METHOD) && path.equals(API_POSTS)) {
+            postController.all(response);
+            return;
         }
+        if (method.equals(GET_METHOD) && path.matches(API_POSTS_ID)) {
+            final var id = Long.parseLong(path.substring(path.lastIndexOf(STR) + 1));
+            postController.getById(id, response);
+            return;
+        }
+        if (method.equals(POST_METHOD) && path.equals(API_POSTS)) {
+            postController.save(req.getReader(), response);
+        }
+        if (method.equals(DELETE_METHOD) && path.matches(API_POSTS_ID)) {
+            final var id = Long.parseLong(path.substring(path.lastIndexOf(STR) + 1));
+            postController.removeById(id, response);
+        }
+
     }
 }

@@ -16,8 +16,8 @@ public class PostRepository {
     private final ConcurrentHashMap<Long, Post> posts;
     private final AtomicLong idCounter = new AtomicLong(0L);
 
-    public PostRepository()  {
-        posts  = new ConcurrentHashMap<>();
+    public PostRepository() {
+        posts = new ConcurrentHashMap<>();
     }
 
     public List<Post> all() {
@@ -30,19 +30,15 @@ public class PostRepository {
     }
 
     public Post save(Post post) {
-        if (post.getId() != 0 && !posts.containsKey(post.getId())) {
-            throw new NotFoundException();
-
-        }else {
-            posts.put(post.getId(), post);
+        if (post.getId() == 0) {
+            long id = idCounter.incrementAndGet();
+            ;
+            post.setId(id);
+            posts.put(id, post);
+        } else if (post.getId() != 0) {
+            Long currentId = post.getId();
+            posts.put(currentId, post);
         }
-
-        if(post.getId() == 0) {
-            var newId = idCounter.incrementAndGet();
-            post.setId(newId);
-            posts.put(post.getId(), post);
-        }
-
         return post;
     }
 
@@ -50,7 +46,7 @@ public class PostRepository {
         if (posts.containsKey(id)) {
             posts.remove(id);
         } else {
-            throw new NotFoundException("Введен неверный id");
+            throw new NotFoundException("Указанный id не найден");
         }
     }
 }
