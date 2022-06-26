@@ -50,6 +50,7 @@ public class MainServlet extends HttpServlet {
         final var id = Long.parseLong(path.substring(path.lastIndexOf(STR) + 1));
         postController.removeById(id, response);
       }
+      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
     } catch (NotFoundException e) {
       response.setStatus(HttpServletResponse.SC_NOT_FOUND);
     } catch (IOException ioException) {
